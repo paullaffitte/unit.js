@@ -1,13 +1,4 @@
-function success(test, student, reference, __results) {
-  __results.ele('testcase', {
-    name: test.name.split('.')[2],
-    classname: test.name.split('.')[0] + '.' + test.name.split('.')[1],
-  });
-
-  console.log(test.name + ' > SUCCESS');
-}
-
-function getFailureDetails(detail, test, student, reference) {
+function getDetails(detail, test, student, reference) {
   let msg = '';
 
   msg += `Executed shell command: ${test.finalCommand}\n`;
@@ -43,6 +34,15 @@ function getFailureDetails(detail, test, student, reference) {
   return msg;
 }
 
+function success(test, student, reference, __results) {
+  __results.ele('testcase', {
+    name: test.name.split('.')[2],
+    classname: test.name.split('.')[0] + '.' + test.name.split('.')[1],
+  }, getDetails(null, test, student, reference));
+
+  console.log(test.name + ' > SUCCESS');
+}
+
 function failure(detail, test, student, reference, __results) {
   const testcase = __results.ele('testcase', {
     name: test.name.split('.')[2],
@@ -52,11 +52,11 @@ function failure(detail, test, student, reference, __results) {
   if (detail === 'crash' || detail === 'timeout') {
     testcase.ele('error', {
       message: 'Test crashed'
-    }, getFailureDetails(detail, test, student, reference));
+    }, getDetails(detail, test, student, reference));
   } else {
     testcase.ele('failure', {
       message: 'Test failed'
-    }, getFailureDetails(detail, test, student, reference));
+    }, getDetails(detail, test, student, reference));
   }
 
   console.log(test.name + ' > FAILURE (' + detail + ')');
