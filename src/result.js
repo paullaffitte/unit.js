@@ -38,7 +38,7 @@ function success(test, student, reference, __results) {
   __results.ele('testcase', {
     name: test.name.split('.')[2],
     classname: test.name.split('.')[0] + '.' + test.name.split('.')[1],
-  }, getDetails(null, test, student, reference));
+  });
 
   console.log(test.name + ' > SUCCESS');
 }
