@@ -10,7 +10,7 @@ let index = -1;
 let __results;
 
 function test(options) {
-  let cmd = './' + binary + ' ' + (options.args || '');
+  let cmd = binary + ' ' + (options.args || '');
 
   if (options.stdin) {
     cmd = `echo "${options.stdin}" | ` + cmd;
@@ -35,7 +35,7 @@ function test(options) {
     }
 
     if (reference) {
-      let refCmd = './' + reference + ' ' + options.args;
+      let refCmd = reference + ' ' + options.args;
 
       if (options.stdin) {
         refCmd = `echo "${options.stdin}" | ` + refCmd;
