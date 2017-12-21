@@ -35,7 +35,7 @@ function test(options) {
     }
 
     if (reference) {
-      let refCmd = reference + ' ' + options.args;
+      let refCmd = reference + ' ' + (options.args || '');
 
       if (options.stdin) {
         refCmd = `echo "${options.stdin}" | ` + refCmd;
