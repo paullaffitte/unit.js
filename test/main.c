@@ -12,30 +12,26 @@
 #include <printf.h>
 
 int         main(const int argc, const char *argv[], const char *envp[]) {
-    if (argc == 1) {
-            printf("42\n");
-            return 0;
-        } else if (argc == 2) {
-                       printf("41\n");
-                       return 0;
-                   } else if (argc == 3) {
-                                       printf("42\n");
-                                       return 42;
-                                   } else if (argc == 4) {
-                                                       printf("%s\n", strdup(NULL));
-                                                       return 0;
-                                                   } else if (argc == 5) {
-                                                                       while(1);
-                                                                       return 0;
-                                                                   } else if (argc == 6) {
-                                                                                       dprintf(2, "41\n");
-                                                                                       return 0;
-                                                                                   }
+//    if (argc == 1) {
+//            printf("42\n");
+//            return 0;
+//        } else if (argc == 2) {
+//                       printf("41\n");
+//                       return 0;
+//                   } else if (argc == 3) {
+//                                       printf("42\n");
+//                                       return 42;
+//                                   } else if (argc == 4) {
+//                                                       printf("%s\n", strdup(NULL));
+//                                                       return 0;
+//                                                   } else if (argc == 5) {
+//                                                                       while(1);
+//                                                                       return 0;
+//                                                                   } else if (argc == 6) {
+//                                                                                       dprintf(2, "41\n");
+//                                                                                       return 0;
+//                                                                                   }
 
-//char buff[42];
-//
-//read(0, buff, 5);
-//buff[5] = 0;
-//
-//printf("%s\n", buff);
+char *a = 0;
+a[0] = 42;
 }

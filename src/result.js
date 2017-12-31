@@ -12,22 +12,22 @@ function getDetails(detail, test, student, reference) {
   }
 
   msg += `============== STDOUT ==============\n`;
-  msg += student.stdout;
+  msg += student.stdout || '\n';
   msg += `====================================\n\n`;
 
   msg += `============== STDERR ==============\n`;
-  msg += student.stderr;
+  msg += student.stderr || '\n';
   msg += `====================================\n\n`;
 
   if (reference || test.stdout) {
     msg += `========= EXCPECTED STDOUT =========\n`;
-    msg += reference ? reference.stdout : test.stdout;
+    msg += reference ? reference.stdout || '\n' : test.stdout || '\n';
     msg += `====================================\n\n`;
   }
 
   if (reference || test.stderr) {
     msg += `========= EXCPECTED STDERR =========\n`;
-    msg += reference ? reference.stderr : test.stderr;
+    msg += reference ? reference.stderr || '\n' : test.stderr || '\n';
     msg += `====================================\n\n`;
   }
 

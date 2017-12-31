@@ -7,7 +7,7 @@ let binary = 'a.out';
 let reference = null;
 let index = -1;
 
-let __results;
+let __results = 42;
 
 function test(options) {
   let cmd = binary + ' ' + (options.args || '');
@@ -26,11 +26,11 @@ function test(options) {
       stdout: stdout,
       stderr: stderr,
       returnValue: err ? err.code : 0,
-      crash: err ? err.signal : null
+      crash: err ? err.code : null
     };
 
     if (student.crash) {
-      result.failure(student.crash === 'SIGTERM' ? 'timeout' : 'crash', options, student, __results);
+      result.failure(student.code === 15 ? 'timeout' : 'crash', options, student, null, __results);
       return next();
     }
 
