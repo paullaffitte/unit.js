@@ -21,7 +21,7 @@ function getDetails(detail, test, student, reference) {
   msg += `Executed shell command: ${test.finalCommand}\n`;
   msg += `Process exit signal: ${student.crash ? student.crash : 'None (process exited normally)'}\n`;
 
-  msg += `Process exit status: ${student.returnValue || '-'}`;
+  msg += `Process exit status: ${student.returnValue !== null ? student.returnValue : '-'}`;
   if ((reference && reference.returnValue) || test.returnValue) {
     msg += ` (expected ${reference ? reference.returnValue : test.returnValue})\n\n`;
   } else {
