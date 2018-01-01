@@ -1,11 +1,28 @@
 function getDetails(detail, test, student, reference) {
   let msg = '';
+  let failureReason = '';
 
+  switch (detail) {
+    case 'stdout':
+      failureReason = 'Output differs';
+      break;
+    case 'stderr':
+      failureReason = 'Output differs';
+      break;
+    case 'crash':
+      failureReason = 'Program crashed';
+      break;
+    case 'timeout':
+      failureReason = 'Timed out';
+      break;
+  }
+
+  msg += `Failure reason: ${failureReason}\n`;
   msg += `Executed shell command: ${test.finalCommand}\n`;
   msg += `Process exit signal: ${student.crash ? student.crash : 'None (process exited normally)'}\n`;
 
-  msg += `Process exit status: ${student.returnValue}`;
-  if (reference || test.returnValue) {
+  msg += `Process exit status: ${student.returnValue || '-'}`;
+  if ((reference && reference.returnValue) || test.returnValue) {
     msg += ` (expected ${reference ? reference.returnValue : test.returnValue})\n\n`;
   } else {
     msg += '\n';

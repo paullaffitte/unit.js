@@ -32,6 +32,5 @@ int         main(const int argc, const char *argv[], const char *envp[]) {
 //                                                                                       return 0;
 //                                                                                   }
 
-char *a = 0;
-a[0] = 42;
+while(1);
 }

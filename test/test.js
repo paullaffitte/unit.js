@@ -4,7 +4,7 @@ const unit = require('../unit');
 // unit.reference('/usr/bin/tcsh');
 unit.binary('./42sh');
 
-unit.cmd('echo "int main() {char *a = 0; a[0] = 42;}" > test.c && gcc -o 42sh test.c');
+unit.cmd('gcc -o 42sh main.c');
 
 unit.test({
   name: 'Package.Class 2.Test 3',
