@@ -8,8 +8,7 @@ unit.cmd('gcc -o 42sh main.c');
 
 unit.test({
   name: 'Package.Class 2.Test 3',
-  stdin: 'ls',
-  stdout: 'ok'
+  returnValue: 0
 });
 
 unit.run();
@@ -29,5 +28,3 @@ unit.run();
 //   stderr: 'Error!\n',
 //   returnValue: 84
 // });
-
-unit.run();

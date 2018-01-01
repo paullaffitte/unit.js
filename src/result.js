@@ -15,6 +15,9 @@ function getDetails(detail, test, student, reference) {
     case 'timeout':
       failureReason = 'Timed out';
       break;
+    case 'returnValue':
+      failureReason = 'Bad return value';
+      break;
   }
 
   msg += `Failure reason: ${failureReason}\n`;
@@ -22,7 +25,7 @@ function getDetails(detail, test, student, reference) {
   msg += `Process exit signal: ${student.crash ? student.crash : 'None (process exited normally)'}\n`;
 
   msg += `Process exit status: ${student.returnValue !== null ? student.returnValue : '-'}`;
-  if ((reference && reference.returnValue) || test.returnValue) {
+  if ((reference && typeof reference.returnValue === 'number') || typeof test.returnValue === 'number') {
     msg += ` (expected ${reference ? reference.returnValue : test.returnValue})\n\n`;
   } else {
     msg += '\n';

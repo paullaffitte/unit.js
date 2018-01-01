@@ -32,5 +32,5 @@ int         main(const int argc, const char *argv[], const char *envp[]) {
 //                                                                                       return 0;
 //                                                                                   }
 
-while(1);
+return 42;
 }

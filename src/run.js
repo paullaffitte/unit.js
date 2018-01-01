@@ -26,11 +26,10 @@ function test(options) {
       stdout: stdout,
       stderr: stderr,
       returnValue: err ? err.code : 0,
-      crash: err ? err.signal || 'SIGSEGV' : null
+      crash: err ? (err.code === 139 ? 'SIGSEGV' : err.signal) : null
     };
 
-    console.log(err);
-    if (err) {
+    if (err && (err.signal || err.code === 139)) {
       result.failure(err.killed ? 'timeout' : 'crash', options, student, null, __results);
       return next();
     }
