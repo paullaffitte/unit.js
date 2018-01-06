@@ -14,6 +14,13 @@ function reference(path) {
   });
 }
 
+function template(options) {
+	pipeline.push({
+		action: 'template',
+		options: options
+	});
+}
+
 function test(options) {
   pipeline.push({
     action: 'test',
@@ -34,7 +41,8 @@ function cmd(cmd_string, callback) {
 module.exports = {
   pipeline,
   binary,
-  reference,
+	reference,
+	template,
   test,
   cmd
 };

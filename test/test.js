@@ -1,30 +1,17 @@
 #! /usr/bin/env node
 const unit = require('../unit');
 
-// unit.reference('/usr/bin/tcsh');
-unit.binary('./42sh');
+unit.binary('./student');
 
-unit.cmd('gcc -o 42sh main.c');
+unit.template({
+	templatePath: '../main.c',
+	compile: 'to_be_tested.c',
+	params: '2'
+});
 
 unit.test({
-  name: 'Package.Class 2.Test 3',
-  returnValue: 0
+  name: 'Package.Class.Test',
+  stdout: '8\n'
 });
 
 unit.run();
-
-// unit.binary('./student');
-//
-// unit.cmd('gcc test_1.c -lmy_printf -o student');
-// unit.test({
-//   name: 'Package.Class.Test 1',
-//   stdout: 'Salut\n',
-//   returnValue: 0
-// });
-//
-// unit.cmd('gcc test_gestion_d_erreur.c -lmy_printf -o student');
-// unit.test({
-//   name: 'Package.Class.Test Erreur',
-//   stderr: 'Error!\n',
-//   returnValue: 84
-// });

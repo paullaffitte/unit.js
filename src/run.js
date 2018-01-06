@@ -1,3 +1,4 @@
+const fs = require('fs');
 const exec = require('child_process').exec;
 const xml = require('xmlbuilder');
 const pipeline = require('./pipeline');
@@ -94,7 +95,23 @@ const actions = {
   reference: function(path) {
     reference = path;
     return next();
-  }
+  },
+	template: function(options) {
+		let t = fs.readFileSync(options.templatePath).toString();
+
+		Object.keys(options).forEach(key => {
+			if (key !== 'templatePath' && key !== 'compile') {
+				t = t.replace(`{{${key}}}`, options[key]);
+			}
+		});
+
+		fs.writeFileSync('__instance.c', t);
+
+		exec(`gcc -W -Wall -Wextra -Werror -o student __instance.c ${options.compile}`, function(err, stdout, stderr) {
+			if (err) console.log(err);
+			return next();
+		});
+	}
 };
 
 function next() {
