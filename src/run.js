@@ -78,6 +78,40 @@ function test(options) {
   });
 }
 
+/*
+const r = {
+	// NECESSARY FIELDS
+	name: 'Package.Class.Name', // Test name
+	result: 'stdout', // Test result -> Possible values : success / stdout / stderr / crash / timeout / returnValue
+	command: 'ls', // Executed command
+
+	// COMPARISON FIELDS
+	returnValue: 42, // Exit status
+	stdout: 'Hello world!', // Test std output
+	stderr: 'Error', // Test std error
+	expected: {}, // Expected results -> Same fields as above
+
+	// OPTIONAL FIELDS
+	crash: 'SIGSEGV', // Exit signal (to be specified if test result is 'crash')
+};
+*/
+
+function customCallback(testResult) {
+	if (testResult.result === 'success') {
+		result.success(testResult, {}, {}, __results);
+	} else {
+		testResult.expected.finalCommand = testResult.command;
+		testResult.expected.name = testResult.name;
+		result.failure(testResult.result, testResult.expected, testResult, testResult.expected, __results);
+	}
+
+	return next();
+}
+
+function customTest(options) {
+	options.callback(customCallback);
+}
+
 const actions = {
   cmd: function(options) {
     exec(options.literal, function(err, stdout, stderr) {
@@ -111,7 +145,8 @@ const actions = {
 			if (err) console.log(err);
 			return next();
 		});
-	}
+	},
+  custom: customTest
 };
 
 function next() {

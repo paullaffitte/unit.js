@@ -32,22 +32,22 @@ function getDetails(detail, test, student, reference) {
   }
 
   msg += `============== STDOUT ==============\n`;
-  msg += student.stdout || '\n';
+  msg += student.stdout || '';
   msg += `====================================\n\n`;
 
   msg += `============== STDERR ==============\n`;
-  msg += student.stderr || '\n';
+  msg += student.stderr || '';
   msg += `====================================\n\n`;
 
   if (reference || test.stdout) {
     msg += `========= EXCPECTED STDOUT =========\n`;
-    msg += reference ? reference.stdout || '\n' : test.stdout || '\n';
+    msg += reference ? reference.stdout || '\n' : test.stdout || '';
     msg += `====================================\n\n`;
   }
 
   if (reference || test.stderr) {
     msg += `========= EXCPECTED STDERR =========\n`;
-    msg += reference ? reference.stderr || '\n' : test.stderr || '\n';
+    msg += reference ? reference.stderr || '\n' : test.stderr || '';
     msg += `====================================\n\n`;
   }
 

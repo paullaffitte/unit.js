@@ -38,11 +38,21 @@ function cmd(cmd_string, callback) {
   });
 }
 
+function custom(callback) {
+	pipeline.push({
+		action: 'custom',
+		options: {
+			callback: callback
+		}
+	});
+}
+
 module.exports = {
   pipeline,
   binary,
 	reference,
 	template,
-  test,
+	test,
+	custom,
   cmd
 };
