@@ -1,34 +1,33 @@
 #! /usr/bin/env node
 const unit = require('../unit');
 
-unit.binary('./student');
+unit.binary("./test.sh");
 
-unit.test({
-  name: 'Package.Class.Test',
-  stdout: '8\n'
-});
-
-unit.run();
-
-unit.binary("...");
-
-unit.addTester("outputCmp", (student, reference) => {
-  if (student.stdout != reference.out)
+unit.addEvaluator("koala", (student, reference) => {
+  if (student.stdout != "koala") {
     return {
       success: false,
-      message: "output differs: " + student.stdout + " != " + reference.out
-    }
+      message: "output differs: " + student.stdout + " != koala\n\n",
+      summary: "output differs"
+    };
+  }
+
+  return {
+      success: true
+    };
 });
 
 unit.test({
-  name: "...",
-  args: "...",
-  stdin: "...",
-  timeout: "...",
-  tester: {
-    method: outputCmp
-    reference: {
-    	out: "test"
-    }
+  name: "Test.Class.Name",
+  // args: "",
+  // stdin: "",
+  timeout: 1000,
+  evaluator: {
+    method: "koala"
+    // reference: {
+    //   out: "test"
+    // }
   }
 })
+
+unit.run();

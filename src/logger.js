@@ -1,4 +1,4 @@
-function testcase(test) {
+function testcase(__results, test) {
   const splitedName = test.name.split('.');
   return __results.ele('testcase', {
     name: splitedName[2],
@@ -7,8 +7,8 @@ function testcase(test) {
 }
 
 function failure(testcase, details) {
-  return testcase.ele('error', {
-    message: 'Test crashed'
+  return testcase.ele('failure', {
+    message: 'Test failed'
   }, details);
 }
 

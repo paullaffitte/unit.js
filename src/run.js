@@ -8,20 +8,14 @@ const result = require('./result');
 let _binary = null;
 let _binaryRef = null;
 let _index = -1;
-let _testers = {};
 
 let __results;
 
-
-function addTester(testerName, tester) {
-  _testers[testerName] = tester;
-}
-
 function prepareCmd(binary, args, stdin) {
-  let cmd = _binary + ' ' + (options.args || '');
+  let cmd = _binary + ' ' + (args || '');
 
-  if (options.stdin) {
-    cmd = `echo "${options.stdin}" | ` + cmd;
+  if (stdin) {
+    cmd = `echo "${stdin}" | ` + cmd;
   }
 
   return cmd;
@@ -47,28 +41,14 @@ function prepareTrace(err, stdout, stderr) {
 
 function execAndTrace(binary, options) {
   return new Promise(function(resolve, reject) {
-    options.cmd = prepareCmd(binary, options.args, options.stdin)
+    options.cmd = prepareCmd(binary, options.args, options.stdin);
       exec(options.cmd, {
-        timeout: timeout,
+        timeout: options.timeout,
         killSignal: 'SIGTERM'
-      }, prepareTrace});
+      }, () => {
+        resolve(prepareTrace());
+      });
   });
-}
-
-function evaluate(student, reference, tester) {
-  if (student.error) {
-    result.failure(options, student, null, __results);
-    return next();
-  }
-
-  let result = tester.method(student, reference);
-  if (result && !result.success) {
-    result.failure(options, student, reference, __results);
-  } else {
-    result.success(options, student, reference, __results);
-  }
-
-  return next();
 }
 
 const actions = {
@@ -86,16 +66,22 @@ const actions = {
     let student = null;
     let reference = null;
 
-    then(execAndTrace(_binary, options))
+    execAndTrace(_binary, options)
       .then((trace) => {
         student = trace;
       })
-      .execAndTrace(_binaryRef, options)
+      .then(() => {
+        return execAndTrace(_binaryRef, options);
+      })
       .then((trace) => {
         reference = trace;
       })
       .then(() => {
-        evaluate(student, reference, options.tester);
+        result.evaluate(options, student, reference, __results);
+        next();
+      })
+      .catch((error) => {
+        console.error(error);
       })
   },
 
