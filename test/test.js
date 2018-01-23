@@ -10,22 +10,25 @@ unit.test({
 
 unit.run();
 
-// unit.binary("...");
-// unit.test({
-//   name: "...",
-//   args: "...",
-//   stdin: "...",
-//   timeout: "...",
-//   tester: {
-//     method: outputCmp
-//     out: "test"
-//   }
-// })
+unit.binary("...");
 
-// unit.addTester("outputCmp", (student, reference) => {
-//   if (student.stdout != reference.out)
-//     return {
-//       status: "failed",
-//       message: "output differs: " + student.stdout + " != " + reference.out
-//     }
-// });
+unit.addTester("outputCmp", (student, reference) => {
+  if (student.stdout != reference.out)
+    return {
+      success: false,
+      message: "output differs: " + student.stdout + " != " + reference.out
+    }
+});
+
+unit.test({
+  name: "...",
+  args: "...",
+  stdin: "...",
+  timeout: "...",
+  tester: {
+    method: outputCmp
+    reference: {
+    	out: "test"
+    }
+  }
+})

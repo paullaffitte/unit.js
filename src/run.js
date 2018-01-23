@@ -1,108 +1,120 @@
+
 const fs = require('fs');
 const exec = require('child_process').exec;
 const xml = require('xmlbuilder');
 const pipeline = require('./pipeline');
 const result = require('./result');
 
-let binary = 'a.out';
-let reference = null;
-let index = -1;
+let _binary = null;
+let _binaryRef = null;
+let _index = -1;
+let _testers = {};
 
-let __results = 42;
+let __results;
 
-function test(options) {
-  let cmd = binary + ' ' + (options.args || '');
+
+function addTester(testerName, tester) {
+  _testers[testerName] = tester;
+}
+
+function prepareCmd(binary, args, stdin) {
+  let cmd = _binary + ' ' + (options.args || '');
 
   if (options.stdin) {
     cmd = `echo "${options.stdin}" | ` + cmd;
   }
 
-  options.finalCommand = cmd;
+  return cmd;
+}
 
-  exec(cmd, {
-    timeout: 3000,
-    killSignal: 'SIGTERM'
-  }, (err, stdout, stderr) => {
-    const student = {
-      stdout: stdout,
-      stderr: stderr,
-      returnValue: err ? err.code : 0,
-      crash: err ? (err.code === 139 ? 'SIGSEGV' : err.signal) : null
+function prepareTrace(err, stdout, stderr) {
+
+  let trace = {
+    stdout: stdout,
+    stderr: stderr,
+    returnValue: err ? err.code : 0,
+  };
+
+  if (err) {
+    trace.error = {
+      signal: err.code === 139 ? 'SIGSEGV' : err.signal,
+      label: err.killed ? 'timeout' : 'crash'
     };
+  }
 
-    if (err && (err.signal || err.code === 139)) {
-      result.failure(err.killed ? 'timeout' : 'crash', options, student, null, __results);
-      return next();
-    }
+  return trace;
+}
 
-    if (reference) {
-      let refCmd = reference + ' ' + (options.args || '');
-
-      if (options.stdin) {
-        refCmd = `echo "${options.stdin}" | ` + refCmd;
-      }
-
-      exec(refCmd, (refErr, refStdout, refStderr) => {
-        const ref = {
-          stdout: refStdout,
-          stderr: refStderr,
-          returnValue: refErr ? refErr.code : 0,
-          crash: refErr ? refErr.signal : null
-        };
-
-        if (student.stdout !== ref.stdout) {
-          result.failure('stdout', options, student, ref, __results);
-        } else if (student.stderr !== ref.stderr) {
-          result.failure('stderr', options, student, ref, __results);
-        } else if (student.returnValue !== ref.returnValue) {
-          result.failure('returnValue', options, student, ref, __results);
-        } else {
-          result.success(options, student, ref, __results);
-        }
-
-        return next();
-      });
-    } else {
-      if (typeof options.stdout !== 'undefined' && student.stdout !== options.stdout) {
-        result.failure('stdout', options, student, options, __results);
-      } else if (typeof options.stderr !== 'undefined' && student.stderr !== options.stderr) {
-        result.failure('stderr', options, student, options, __results);
-      } else if (typeof options.returnValue !== 'undefined' && student.returnValue !== options.returnValue) {
-        result.failure('returnValue', options, student, options, __results);
-      } else {
-        result.success(options, student, options, __results);
-      }
-
-      return next();
-    }
+function execAndTrace(binary, options) {
+  return new Promise(function(resolve, reject) {
+    options.cmd = prepareCmd(binary, options.args, options.stdin)
+      exec(options.cmd, {
+        timeout: timeout,
+        killSignal: 'SIGTERM'
+      }, prepareTrace});
   });
+}
+
+function evaluate(student, reference, tester) {
+  if (student.error) {
+    result.failure(options, student, null, __results);
+    return next();
+  }
+
+  let result = tester.method(student, reference);
+  if (result && !result.success) {
+    result.failure(options, student, reference, __results);
+  } else {
+    result.success(options, student, reference, __results);
+  }
+
+  return next();
 }
 
 const actions = {
   cmd: function(options) {
-    exec(options.literal, function(err, stdout, stderr) {
+    exec(options.literal, (err, stdout, stderr) => {
       if (typeof options.callback === 'function') {
         options.callback(err, stdout, stderr);
       }
       return next();
     });
   },
-  test: test,
+
+  test: function(options) {
+    let timeout = options.timeout ? options.timeout : 3000;
+    let student = null;
+    let reference = null;
+
+    then(execAndTrace(_binary, options))
+      .then((trace) => {
+        student = trace;
+      })
+      .execAndTrace(_binaryRef, options)
+      .then((trace) => {
+        reference = trace;
+      })
+      .then(() => {
+        evaluate(student, reference, options.tester);
+      })
+  },
+
   binary: function(path) {
-    binary = path;
+    _binary = path;
     return next();
   },
+
   reference: function(path) {
-    reference = path;
+    _binaryRef = path;
     return next();
   }
 };
 
 function next() {
-  index += 1;
+  _index += 1;
 
-  if (index < pipeline.pipeline.length) {
-    actions[pipeline.pipeline[index].action](pipeline.pipeline[index].options);
+  if (_index < pipeline.pipeline.length) {
+    actions[pipeline.pipeline[_index].action](pipeline.pipeline[_index].options);
   } else {
     console.warn(__results.end({
       pretty: true
