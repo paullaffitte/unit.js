@@ -12,7 +12,7 @@ let _index = -1;
 let __results;
 
 function prepareCmd(binary, args, stdin) {
-  let cmd = _binary + ' ' + (args || '');
+  let cmd = binary + ' ' + (args || '');
 
   if (stdin) {
     cmd = `echo "${stdin}" | ` + cmd;
@@ -21,9 +21,10 @@ function prepareCmd(binary, args, stdin) {
   return cmd;
 }
 
-function prepareTrace(err, stdout, stderr) {
+function prepareTrace(cmd, err, stdout, stderr) {
 
   let trace = {
+    cmd: cmd,
     stdout: stdout,
     stderr: stderr,
     returnValue: err ? err.code : 0,
@@ -35,20 +36,17 @@ function prepareTrace(err, stdout, stderr) {
       label: err.killed ? 'timeout' : 'crash'
     };
   }
-
   return trace;
 }
 
 function execAndTrace(binary, options) {
   return new Promise(function(resolve, reject) {
-    if (!binary)
-      resolve(null);
-    options.cmd = prepareCmd(binary, options.args, options.stdin);
-      exec(options.cmd, {
+    let cmd = prepareCmd(binary, options.args, options.stdin);
+      exec(cmd, {
         timeout: options.timeout,
         killSignal: 'SIGTERM'
       }, (err, stdout, stderr) => {
-        resolve(prepareTrace(err, stdout, stderr));
+        resolve(prepareTrace(cmd, err, stdout, stderr));
       });
   });
 }
@@ -68,13 +66,13 @@ const actions = {
     let student = null;
     let reference = null;
 
+    let optionsRef = JSON.parse(JSON.stringify(options));
+
     execAndTrace(_binary, options)
       .then((trace) => {
         student = trace;
       })
-      .then(() => {
-        return execAndTrace(_binaryRef, options);
-      })
+      .then(execAndTrace.bind({}, _binaryRef, optionsRef))
       .then((trace) => {
         reference = trace;
       })

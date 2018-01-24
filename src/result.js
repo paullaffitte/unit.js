@@ -12,7 +12,13 @@ function evaluate(test, student, reference, __results) {
     return next();
   }
 
-  const evaluator = _evaluators[test.evaluator.method];
+  let evaluator = _evaluators[test.evaluator.method];
+  if (test.evaluator.reference) {
+    evaluator = evaluator.bind(test.evaluator.reference);
+  } else {
+    evaluator = evaluator.bind({});
+  }
+
   let result = evaluator(student, reference);
   if (result && !result.success) {
     failure(test, student, result, __results);
