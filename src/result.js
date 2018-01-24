@@ -8,8 +8,9 @@ function addEvaluator(evaluatorName, evaluator) {
 
 function evaluate(test, student, reference, __results) {
   if (student.error) {
-    failure(test, student, __results);
-    return next();
+    // console.log(student, __results);
+    failure(test, student, null, __results);
+    return;
   }
 
   let evaluator = _evaluators[test.evaluator.method];
@@ -28,14 +29,14 @@ function evaluate(test, student, reference, __results) {
 }
 
 function getLogs(test, student, result) {
-  let msg = result.message ? result.message : '';
+  let msg = result ? result.message : '';
   let exitSignal = 'None (process exited normally)';
 
   if (student.error) {
     exitSignal = `${student.error.signal} [${student.error.label}]`;
   }
 
-  msg += `Executed shell command: ${test.cmd}\n`;
+  msg += `Executed shell command: ${student.cmd}\n`;
   msg += `Process exit signal: ${exitSignal}\n`;
   msg += `Process exit status: ${student.returnValue}`;
   return msg;
@@ -54,7 +55,8 @@ function failure(test, student, result, __results) {
     console.log(test.name + ' > ERROR (' + student.error.label + ')');
     logger.error(testcase, logs);
   } else {
-    console.log(test.name + ' > FAILURE (' + result.summary + ')');
+    let failureSummary = (result ? result.summary : '');
+    console.log(test.name + ' > FAILURE (' + failureSummary + ')');
     logger.failure(testcase, logs);
   }
 

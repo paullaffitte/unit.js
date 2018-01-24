@@ -50,7 +50,7 @@ unit.reference("./ref.sh");
 unit.test({
   name: "basic.koala_static.koala",
   // stdin: "",
-  timeout: 1000,
+  timeout: 100,
   evaluator: {
     method: "koala_static"
   }
@@ -89,6 +89,25 @@ unit.test({
 unit.test({
   name: "basic.stdout.args",
   args: "-h -f",
+  evaluator: {
+    method: "stdout"
+  }
+});
+
+unit.test({
+  name: "basic.stdout.timeout",
+  timeout: 10000,
+  args: "-h -f",
+  evaluator: {
+    method: "stdout"
+  }
+});
+
+unit.cmd('gcc test.c');
+unit.binary('./a.out');
+
+unit.test({
+  name: "advanced.sig.segv",
   evaluator: {
     method: "stdout"
   }

@@ -62,10 +62,10 @@ const actions = {
   },
 
   test: function(options) {
-    let timeout = options.timeout ? options.timeout : 3000;
     let student = null;
     let reference = null;
 
+    options.timeout = options.timeout ? options.timeout : 3000;
     let optionsRef = JSON.parse(JSON.stringify(options));
 
     execAndTrace(_binary, options)
