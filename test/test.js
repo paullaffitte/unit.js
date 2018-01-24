@@ -3,7 +3,7 @@ const unit = require('../unit');
 
 unit.binary("./test.sh");
 
-unit.addEvaluator("koala", (student, reference) => {
+unit.addEvaluator("koala", (student) => {
   if (student.stdout != "koala") {
     return {
       success: false,
@@ -18,7 +18,7 @@ unit.addEvaluator("koala", (student, reference) => {
 });
 
 unit.test({
-  name: "Test.Class.Name",
+  name: "Test.Class.koala",
   // args: "",
   // stdin: "",
   timeout: 1000,
@@ -28,6 +28,19 @@ unit.test({
     //   out: "test"
     // }
   }
-})
+});
+
+unit.test({
+  name: "Test.Class.koala",
+  args: "-h",
+  // stdin: "",
+  timeout: 1000,
+  evaluator: {
+    method: "koala"
+    // reference: {
+    //   out: "test"
+    // }
+  }
+});
 
 unit.run();

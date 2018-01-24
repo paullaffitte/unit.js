@@ -8,21 +8,21 @@ function addEvaluator(evaluatorName, evaluator) {
 
 function evaluate(test, student, reference, __results) {
   if (student.error) {
-    failure(test, student, null, __results);
+    failure(test, student, __results);
     return next();
   }
 
   const evaluator = _evaluators[test.evaluator.method];
   let result = evaluator(student, reference);
   if (result && !result.success) {
-    failure(test, student, reference, __results);
+    failure(test, student, result, __results);
   } else {
-    success(test, student, reference, __results);
+    success(test, result, __results);
   }
 }
 
-function getLogs(test, student, reference) {
-  let msg = student.message ? student.message : '';
+function getLogs(test, student, result) {
+  let msg = result.message ? result.message : '';
   let exitSignal = 'None (process exited normally)';
 
   if (student.error) {
@@ -35,20 +35,20 @@ function getLogs(test, student, reference) {
   return msg;
 }
 
-function success(test, student, reference, __results) {
+function success(test, result, __results) {
   logger.testcase(__results, test);
   console.log(test.name + ' > SUCCESS');
 }
 
-function failure(test, student, reference, __results) {
+function failure(test, student, result, __results) {
   let testcase = logger.testcase(__results, test);
 
-  let logs = getLogs(test, student, reference);
+  let logs = getLogs(test, student, result);
   if (student.error) {
     console.log(test.name + ' > ERROR (' + student.error.label + ')');
     logger.error(testcase, logs);
   } else {
-    console.log(test.name + ' > FAILURE (' + student.summary + ')');
+    console.log(test.name + ' > FAILURE (' + result.summary + ')');
     logger.failure(testcase, logs);
   }
 

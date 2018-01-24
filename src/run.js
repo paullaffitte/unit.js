@@ -41,12 +41,14 @@ function prepareTrace(err, stdout, stderr) {
 
 function execAndTrace(binary, options) {
   return new Promise(function(resolve, reject) {
+    if (!binary)
+      resolve(null);
     options.cmd = prepareCmd(binary, options.args, options.stdin);
       exec(options.cmd, {
         timeout: options.timeout,
         killSignal: 'SIGTERM'
-      }, () => {
-        resolve(prepareTrace());
+      }, (err, stdout, stderr) => {
+        resolve(prepareTrace(err, stdout, stderr));
       });
   });
 }
