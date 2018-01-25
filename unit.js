@@ -1,6 +1,7 @@
 const pipeline = require('./src/pipeline');
 const result = require('./src/result');
 const run = require('./src/run');
+const exec = require('./src/exec').execAndTrace;
 
 const binary = pipeline.binary;
 const reference = pipeline.reference;
@@ -18,5 +19,6 @@ module.exports = {
   success,
   failure,
   run,
-  addEvaluator
+  addEvaluator,
+  exec
 };

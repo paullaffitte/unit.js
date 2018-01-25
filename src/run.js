@@ -1,9 +1,10 @@
 
 const fs = require('fs');
-const exec = require('child_process').exec;
+const child_process = require('child_process');
 const xml = require('xmlbuilder');
 const pipeline = require('./pipeline');
 const result = require('./result');
+const exec = require('./exec').execAndTrace;
 
 let _binary = null;
 let _binaryRef = null;
@@ -21,39 +22,9 @@ function prepareCmd(binary, args, stdin) {
   return cmd;
 }
 
-function prepareTrace(cmd, err, stdout, stderr) {
-
-  let trace = {
-    cmd: cmd,
-    stdout: stdout,
-    stderr: stderr,
-    returnValue: err ? err.code : 0,
-  };
-
-  if (err) {
-    trace.error = {
-      signal: err.code === 139 ? 'SIGSEGV' : err.signal,
-      label: err.killed ? 'timeout' : 'crash'
-    };
-  }
-  return trace;
-}
-
-function execAndTrace(binary, options) {
-  return new Promise(function(resolve, reject) {
-    let cmd = prepareCmd(binary, options.args, options.stdin);
-      exec(cmd, {
-        timeout: options.timeout,
-        killSignal: 'SIGTERM'
-      }, (err, stdout, stderr) => {
-        resolve(prepareTrace(cmd, err, stdout, stderr));
-      });
-  });
-}
-
 const actions = {
   cmd: function(options) {
-    exec(options.literal, (err, stdout, stderr) => {
+    child_process.exec(options.literal, (err, stdout, stderr) => {
       if (typeof options.callback === 'function') {
         options.callback(err, stdout, stderr);
       }
@@ -62,27 +33,24 @@ const actions = {
   },
 
   test: function(options) {
-    let student = null;
-    let reference = null;
+    let student = {};
+    let reference = {};
 
-    options.timeout = options.timeout ? options.timeout : 3000;
+    let cmd = prepareCmd(_binary, options.args, options.stdin);
     let optionsRef = JSON.parse(JSON.stringify(options));
+    let cmdRef = prepareCmd(_binaryRef, optionsRef.args, optionsRef.stdin);
 
-    execAndTrace(_binary, options)
+    exec(cmd, options.timeout)
       .then((trace) => {
-        student = trace;
+        student.trace = trace;
       })
-      .then(execAndTrace.bind({}, _binaryRef, optionsRef))
+      .then(exec.bind({}, cmdRef, options.timeout))
       .then((trace) => {
-        reference = trace;
+        reference.trace = trace;
       })
-      .then(() => {
-        result.evaluate(options, student, reference, __results);
-        next();
-      })
-      .catch((error) => {
-        console.error(error);
-      })
+      .then(result.evaluate.bind({test: "aze bonjour"}, options, student, reference, __results))
+      .then(next)
+      .catch(console.error);
   },
 
   binary: function(path) {

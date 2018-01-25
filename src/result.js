@@ -7,25 +7,28 @@ function addEvaluator(evaluatorName, evaluator) {
 }
 
 function evaluate(test, student, reference, __results) {
+  student = student.trace;
+  reference = reference.trace;
   if (student.error) {
-    // console.log(student, __results);
     failure(test, student, null, __results);
     return;
   }
 
   let evaluator = _evaluators[test.evaluator.method];
-  if (test.evaluator.reference) {
-    evaluator = evaluator.bind(test.evaluator.reference);
+  if (test.evaluator.data) {
+    evaluator = evaluator.bind(test.evaluator.data);
   } else {
     evaluator = evaluator.bind({});
   }
 
-  let result = evaluator(student, reference);
-  if (result && !result.success) {
-    failure(test, student, result, __results);
-  } else {
-    success(test, result, __results);
-  }
+  return evaluator(student, reference)
+    .then((result) => {
+      if (result && !result.success) {
+        failure(test, student, result, __results);
+      } else {
+        success(test, result, __results);
+      }
+    });
 }
 
 function getLogs(test, student, result) {
