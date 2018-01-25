@@ -31,8 +31,8 @@ function evaluate(test, student, reference, __results) {
     });
 }
 
-function getLogs(test, student, result) {
-  let msg = result ? result.message : '';
+function getLogs(student, result) {
+  let msg = `Failure reason: ${result.summary}\n`
   let exitSignal = 'None (process exited normally)';
 
   if (student.error) {
@@ -41,7 +41,9 @@ function getLogs(test, student, result) {
 
   msg += `Executed shell command: ${student.cmd}\n`;
   msg += `Process exit signal: ${exitSignal}\n`;
-  msg += `Process exit status: ${student.returnValue}`;
+  msg += `Process exit status: ${student.returnValue}\n`;
+  if (result)
+    msg += result.message;
   return msg;
 }
 
@@ -53,7 +55,7 @@ function success(test, result, __results) {
 function failure(test, student, result, __results) {
   let testcase = logger.testcase(__results, test);
 
-  let logs = getLogs(test, student, result);
+  let logs = getLogs(student, result);
   if (student.error) {
     console.log(test.name + ' > ERROR (' + student.error.label + ')');
     logger.error(testcase, logs);
