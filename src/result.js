@@ -41,7 +41,7 @@ function getLogs(student, result) {
 
   msg += `Executed shell command: ${student.cmd}\n`;
   msg += `Process exit signal: ${exitSignal}\n`;
-  msg += `Process exit status: ${student.returnValue}\n`;
+  msg += `Process exit status: ${student.returnValue}\n@~#`;
   if (result)
     msg += result.message;
   return msg;
